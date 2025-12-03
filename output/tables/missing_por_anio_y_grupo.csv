@@ -1,0 +1,41 @@
+"grupo_desarrollo","year","n_obs","miss_gdp_pc_ppp","miss_edu_exp_gdp","miss_tertiary_enr","miss_literacy"
+"Países de altos ingresos",2000,84,17,39,43,78
+"Países de altos ingresos",2001,84,17,37,40,74
+"Países de altos ingresos",2002,84,16,32,38,80
+"Países de altos ingresos",2003,84,16,38,36,83
+"Países de altos ingresos",2004,84,16,36,38,81
+"Países de altos ingresos",2005,84,16,38,39,80
+"Países de altos ingresos",2006,84,15,42,37,80
+"Países de altos ingresos",2007,84,14,42,37,79
+"Países de altos ingresos",2008,84,13,40,34,78
+"Países de altos ingresos",2009,84,12,41,37,80
+"Países de altos ingresos",2010,84,12,34,34,74
+"Países de altos ingresos",2011,84,12,30,33,68
+"Países de altos ingresos",2012,84,12,33,31,79
+"Países de altos ingresos",2013,84,12,29,33,76
+"Países de altos ingresos",2014,84,12,26,29,80
+"Países de altos ingresos",2015,84,12,28,25,77
+"Países de altos ingresos",2016,84,12,27,25,80
+"Países de altos ingresos",2017,84,12,20,27,78
+"Países de altos ingresos",2018,84,12,23,25,78
+"Países de altos ingresos",2019,84,12,19,27,79
+"Países emergentes y en desarrollo",2000,131,6,57,64,93
+"Países emergentes y en desarrollo",2001,131,6,66,61,111
+"Países emergentes y en desarrollo",2002,131,6,62,51,116
+"Países emergentes y en desarrollo",2003,131,6,70,53,119
+"Países emergentes y en desarrollo",2004,131,6,60,52,116
+"Países emergentes y en desarrollo",2005,131,6,68,54,115
+"Países emergentes y en desarrollo",2006,131,6,67,56,107
+"Países emergentes y en desarrollo",2007,131,6,66,60,107
+"Países emergentes y en desarrollo",2008,131,4,58,56,105
+"Países emergentes y en desarrollo",2009,131,4,58,49,104
+"Países emergentes y en desarrollo",2010,131,4,44,47,94
+"Países emergentes y en desarrollo",2011,131,4,43,45,94
+"Países emergentes y en desarrollo",2012,131,6,33,43,92
+"Países emergentes y en desarrollo",2013,131,5,33,52,106
+"Países emergentes y en desarrollo",2014,131,6,30,50,90
+"Países emergentes y en desarrollo",2015,131,6,25,44,91
+"Países emergentes y en desarrollo",2016,131,7,27,56,90
+"Países emergentes y en desarrollo",2017,131,6,24,53,95
+"Países emergentes y en desarrollo",2018,131,6,27,58,89
+"Países emergentes y en desarrollo",2019,131,6,31,58,82

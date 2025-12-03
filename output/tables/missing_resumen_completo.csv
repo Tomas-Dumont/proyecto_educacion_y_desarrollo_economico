@@ -1,0 +1,10 @@
+"variable","n_missing","prop_missing"
+"country",0,0
+"iso2c",20,0.47
+"year",0,0
+"gdp_pc_ppp",384,8.93
+"edu_exp_gdp",1603,37.28
+"tertiary_enr",1730,40.23
+"literacy",3578,83.21
+"region",0,0
+"income",0,0
