@@ -1,6 +1,7 @@
 📘 Proyecto: Educación y Desarrollo Económico — Análisis Global y Caso Argentino
 
 Autores: Tomás Dumont - Facundo Rojas
+
 Materia: Ciencia de Datos – FCE UBA
 Año: 2025
 
@@ -28,6 +29,7 @@ Los países que invierten más en educación tienden a presentar mayores niveles
 Argentina sigue parcialmente esta relación, aunque con menor consistencia que los países desarrollados.
 
 📁 Estructura del proyecto
+
 proyecto_educacion_y_desarrollo_economico/
 │
 ├── data/
@@ -130,8 +132,12 @@ install.packages(c("WDI", "tidyverse", "ggplot2", "dplyr", "broom"))
 
 # 2. Ejecutar los scripts en orden
 source("scripts/01_descarga_raw.R")
+
 source("scripts/02_limpieza_transformacion.R")
+
 source("scripts/03_eda_global.R")
+
 source("scripts/04_inferencia_modelos.R")
+
 source("scripts/05_graficos_editorializados.R")
 
