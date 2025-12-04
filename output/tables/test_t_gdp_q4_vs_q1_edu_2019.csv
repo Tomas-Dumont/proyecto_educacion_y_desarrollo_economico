@@ -1,0 +1,2 @@
+"estimate","estimate1","estimate2","statistic","p.value","parameter","conf.low","conf.high","method","alternative","n_q4","n_q1","mean_q4","mean_q1","diff_means"
+-13155.3925427447,8522.53767462807,21677.9302173728,-1.21305001260593,0.25800235095969,8.43072030445055,-37943.0925926546,11632.3075071652,"Welch Two Sample t-test","two.sided",8,9,8522.53767462807,21677.9302173728,-13155.3925427447

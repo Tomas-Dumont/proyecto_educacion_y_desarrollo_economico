@@ -1,14 +1,19 @@
-# 04_outliers_missing.R
+
 # Análisis de datos faltantes y outliers
+install.packages("readr")
 
 library(dplyr)
 library(tidyr)
+library(readr)
 
 # ---------------------------------------------------------------------
 # 1. Cargar datos limpios
 # ---------------------------------------------------------------------
 
 df <- read.csv("data/clean/wb_global_clean.csv")
+
+# Guardar copia ANTES de cualquier decisión (para tabla antes/después)
+panel_raw <- df
 
 # Variables numéricas de interés
 vars_num <- c("gdp_pc_ppp", "edu_exp_gdp", "tertiary_enr", "literacy")
@@ -20,33 +25,24 @@ vars_num <- c("gdp_pc_ppp", "edu_exp_gdp", "tertiary_enr", "literacy")
 n_total <- nrow(df)
 
 missing_resumen <- data.frame(
-  variable   = names(df),
-  n_missing  = sapply(df, function(x) sum(is.na(x))),
+  variable     = names(df),
+  n_missing    = sapply(df, function(x) sum(is.na(x))),
   prop_missing = round(sapply(df, function(x) mean(is.na(x))) * 100, 2)
 )
 
-print(missing_resumen)
+write.csv(missing_resumen,
+          "output/tables/missing_resumen_completo.csv",
+          row.names = FALSE)
 
-dir.create("output/tables", recursive = TRUE, showWarnings = FALSE)
-
-write.csv(
-  missing_resumen,
-  "output/tables/missing_resumen_completo.csv",
-  row.names = FALSE
-)
-
-# También un enfoque más focalizado solo en las variables del modelo
 missing_modelo <- missing_resumen %>%
   filter(variable %in% vars_num)
 
-write.csv(
-  missing_modelo,
-  "output/tables/missing_variables_modelo.csv",
-  row.names = FALSE
-)
+write.csv(missing_modelo,
+          "output/tables/missing_variables_modelo.csv",
+          row.names = FALSE)
 
 # ---------------------------------------------------------------------
-# 3. MISSING POR AÑO Y GRUPO DE DESARROLLO (para comentario cualitativo)
+# 3. MISSING POR AÑO Y GRUPO DE DESARROLLO
 # ---------------------------------------------------------------------
 
 df <- df %>%
@@ -69,19 +65,14 @@ missing_por_anio_grupo <- df %>%
     .groups = "drop"
   )
 
-print(missing_por_anio_grupo)
-
-write.csv(
-  missing_por_anio_grupo,
-  "output/tables/missing_por_anio_y_grupo.csv",
-  row.names = FALSE
-)
+write.csv(missing_por_anio_grupo,
+          "output/tables/missing_por_anio_y_grupo.csv",
+          row.names = FALSE)
 
 # ---------------------------------------------------------------------
 # 4. DETECCIÓN DE OUTLIERS (regla IQR por año y variable)
 # ---------------------------------------------------------------------
 
-# Pasamos a formato largo para calcular IQR por año y variable
 df_long <- df %>%
   select(country, year, all_of(vars_num)) %>%
   pivot_longer(
@@ -90,17 +81,6 @@ df_long <- df %>%
     values_to = "valor"
   )
 
-# Función para calcular límites IQR
-calc_bounds <- function(x) {
-  q1  <- quantile(x, 0.25, na.rm = TRUE)
-  q3  <- quantile(x, 0.75, na.rm = TRUE)
-  iqr <- q3 - q1
-  lower <- q1 - 1.5 * iqr
-  upper <- q3 + 1.5 * iqr
-  c(q1 = q1, q3 = q3, iqr = iqr, lower = lower, upper = upper)
-}
-
-# Calcular bounds por variable y año
 bounds <- df_long %>%
   group_by(variable, year) %>%
   summarise(
@@ -112,45 +92,62 @@ bounds <- df_long %>%
     .groups = "drop"
   )
 
-# Unir bounds y marcar outliers
 df_long_out <- df_long %>%
   left_join(bounds, by = c("variable", "year")) %>%
   mutate(
-    es_outlier = ifelse(
-      !is.na(valor) & (valor < lower | valor > upper),
-      TRUE, FALSE
-    )
+    es_outlier = ifelse(!is.na(valor) & (valor < lower | valor > upper),
+                        TRUE, FALSE)
   )
 
 outliers_detectados <- df_long_out %>%
-  filter(es_outlier) %>%
-  arrange(variable, year, desc(valor))
+  filter(es_outlier)
 
-print(outliers_detectados)
-
-write.csv(
-  outliers_detectados,
-  "output/tables/outliers_detectados_iqr.csv",
-  row.names = FALSE
-)
+write.csv(outliers_detectados,
+          "output/tables/outliers_detectados_iqr.csv",
+          row.names = FALSE)
 
 # ---------------------------------------------------------------------
-# 5. OPCIONAL: CREAR UNA VERSIÓN CON MARCA DE OUTLIERS (SIN ELIMINARLOS)
+# 5. DECISIÓN DE LIMPIEZA PARA EL MODELO
+# ---------------------------------------------------------------------
+# Usamos CASOS COMPLETOS para generar panel_clean
+# (esto debe mencionarse en el informe como MCAR/MAR y sesgos posibles)
+
+panel_clean <- df %>% 
+  drop_na(gdp_pc_ppp, edu_exp_gdp, tertiary_enr, literacy)
+
+# ---------------------------------------------------------------------
+# 6. TABLA ANTES VS DESPUÉS (impacto de la limpieza)
 # ---------------------------------------------------------------------
 
-# Volver a formato ancho, manteniendo una bandera de outlier por variable
-df_out_flag <- df_long_out %>%
-  select(country, year, variable, valor, es_outlier) %>%
-  pivot_wider(
-    names_from = variable,
-    values_from = valor
-  ) %>%
-  # Nota: al volver a wide para valores, perdemos la bandera por variable
-  # Si se quiere mantener bandera por variable, habría que crear columnas
-  # específicas (ej: gdp_pc_ppp_outlier = ...). Para el TP, alcanza con
-  # la tabla de outliers_detectados_iqr.csv
-  distinct()
+vars_desc <- c("gdp_pc_ppp", "edu_exp_gdp", "tertiary_enr")
 
-# Por ahora NO sobrescribimos el clean original, solo dejamos la info de outliers
-# El usuario tomará decisiones en el informe (eliminar, winsorizar, etc.)
+desc_before <- panel_raw %>%
+  summarise(across(
+    all_of(vars_desc),
+    list(mean = ~mean(.x, na.rm = TRUE),
+         sd = ~sd(.x, na.rm = TRUE),
+         median = ~median(.x, na.rm = TRUE)),
+    .names = "{.col}_{.fn}"
+  )) %>% mutate(stage = "antes_limpieza")
+
+desc_after <- panel_clean %>%
+  summarise(across(
+    all_of(vars_desc),
+    list(mean = ~mean(.x, na.rm = TRUE),
+         sd = ~sd(.x, na.rm = TRUE),
+         median = ~median(.x, na.rm = TRUE)),
+    .names = "{.col}_{.fn}"
+  )) %>% mutate(stage = "despues_limpieza")
+
+tabla_impacto <- bind_rows(desc_before, desc_after)
+
+write.csv(tabla_impacto,
+          "output/tables/tabla_antes_despues_missing_outliers.csv",
+          row.names = FALSE)
+
+
+
+write.csv(panel_clean, "data/processed/panel_clean.csv", row.names = FALSE)
+
+
 
